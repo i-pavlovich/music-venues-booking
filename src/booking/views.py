@@ -1,7 +1,10 @@
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.exceptions import APIException
+from rest_framework.response import Response
 
 from .models import Booking, MusicVenue, Service
 from .serializers import BookingSerializer, MusicVenueSerializer, ServiceSerializer
+from .services import is_date_available
 
 
 # TODO: Оптимизация запросов
@@ -49,8 +52,24 @@ class BookingList(generics.ListCreateAPIView):
     serializer_class = BookingSerializer
 
     def get_queryset(self):
-        queryset = Booking.objects.all()
+        queryset = Booking.objects.all().select_related("music_venue")
         username = self.request.query_params.get("username")
         if username is not None:
             queryset = queryset.filter(username=username)
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = BookingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        booking = Booking(**serializer.validated_data)
+
+        if is_date_available(booking):
+            serializer.save()
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
+        raise APIException(
+            detail="The selected date is already taken",
+            code=status.HTTP_400_BAD_REQUEST,
+        )
