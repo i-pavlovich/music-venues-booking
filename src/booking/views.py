@@ -3,11 +3,13 @@ from datetime import datetime
 from rest_framework import generics, status
 from rest_framework.exceptions import APIException
 from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Booking, MusicVenue, Service
 from .serializers import BookingSerializer, MusicVenueSerializer, ServiceSerializer
-from .services import is_date_available
+from .services import is_date_available, cancel_all_bookings
 
 
 class BookingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -86,3 +88,11 @@ class ServiceList(generics.ListCreateAPIView):
         if name is not None:
             queryset = queryset.filter(name__icontains=name)
         return queryset
+
+
+class CancelAllBookings(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        cancel_all_bookings()
+        return Response({"Success": "All bookings have been cancelled"})

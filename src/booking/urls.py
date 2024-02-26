@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     BookingDetail,
     BookingList,
+    CancelAllBookings,
     MusicVenueDetail,
     MusicVenueList,
     ServiceDetail,
@@ -19,4 +20,7 @@ urlpatterns = [
     ),
     path("service_list/", ServiceList.as_view(), name="service_list"),
     path("service/<int:pk>", ServiceDetail.as_view(), name="service_detail"),
+    path(
+        "cancel_all_bookings/", CancelAllBookings.as_view(), name="cancel_all_bookings"
+    ),
 ]

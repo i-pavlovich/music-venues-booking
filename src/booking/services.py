@@ -12,3 +12,7 @@ def is_date_available(booking: Booking) -> bool:
         )
     )
     return not overlapping_bookings.exists()
+
+
+def cancel_all_bookings() -> None:
+    Booking.objects.all().update(is_active=False)
