@@ -26,9 +26,9 @@ class BookingList(generics.ListCreateAPIView):
             queryset = queryset.filter(username=username)
         if history is not None:
             if history == "True":
-                queryset = queryset.filter(check_out__lt=datetime.utcnow())
+                queryset = queryset.filter(is_active=False)
             elif history == "False":
-                queryset = queryset.filter(check_out__gte=datetime.utcnow())
+                queryset = queryset.filter(is_active=True)
         return queryset
 
     def create(self, request, *args, **kwargs):

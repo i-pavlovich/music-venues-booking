@@ -23,6 +23,7 @@ class Booking(models.Model):
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
     username = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f"{self.music_venue.name} music venue is booked by user {self.username}"
