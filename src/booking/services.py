@@ -1,15 +1,11 @@
-from django.db.models import Q
-
 from .models import Booking
 
 
-def is_date_available(booking: Booking) -> bool:
+def is_date_available(booking: dict) -> bool:
     overlapping_bookings = Booking.objects.filter(
-        Q(music_venue=booking.music_venue)
-        & (
-            Q(check_in__range=(booking.check_in, booking.check_out))
-            | Q(check_out__range=(booking.check_in, booking.check_out))
-        )
+        music_venue=booking["music_venue"],
+        check_in__lt=booking["check_out"],
+        check_out__gt=booking["check_in"],
     )
     return not overlapping_bookings.exists()
 

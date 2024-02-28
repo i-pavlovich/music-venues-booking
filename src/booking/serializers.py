@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from .models import Booking, MusicVenue, Service
+from .services import is_date_available
+from .validators import is_correct_time_period
 
 
 class MusicVenueSerializer(serializers.ModelSerializer):
@@ -30,3 +32,14 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = "__all__"
+
+    def validate(self, attrs):
+        if not is_correct_time_period(attrs):
+            raise serializers.ValidationError(
+                {"Invalid date": "Set the correct time period"}
+            )
+        if not is_date_available(attrs):
+            raise serializers.ValidationError(
+                {"Invalid date": "The selected date is already taken"}
+            )
+        return attrs

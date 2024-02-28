@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from rest_framework import generics, status
-from rest_framework.exceptions import APIException
+from rest_framework import generics
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -9,7 +6,7 @@ from rest_framework.views import APIView
 
 from .models import Booking, MusicVenue, Service
 from .serializers import BookingSerializer, MusicVenueSerializer, ServiceSerializer
-from .services import is_date_available, cancel_all_bookings
+from .services import cancel_all_bookings
 
 
 class BookingDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -32,22 +29,6 @@ class BookingList(generics.ListCreateAPIView):
             elif history == "False":
                 queryset = queryset.filter(is_active=True)
         return queryset
-
-    def create(self, request, *args, **kwargs):
-        serializer = BookingSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        booking = Booking(**serializer.validated_data)
-
-        if is_date_available(booking):
-            serializer.save()
-            headers = self.get_success_headers(serializer.data)
-            return Response(
-                serializer.data, status=status.HTTP_201_CREATED, headers=headers
-            )
-        raise APIException(
-            detail="The selected date is already taken",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
 
 
 class MusicVenueDetail(generics.RetrieveUpdateDestroyAPIView):
