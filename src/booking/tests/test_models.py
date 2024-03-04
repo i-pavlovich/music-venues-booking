@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 from django.db import IntegrityError
+from django.utils import timezone
 
 from ..models import Booking, MusicVenue, Service
 
@@ -27,10 +28,13 @@ def music_venue() -> MusicVenue:
 
 @pytest.fixture
 def booking(music_venue) -> Booking:
+    current_date = timezone.make_aware(
+        datetime.now(), timezone=timezone.get_current_timezone()
+    )
     return Booking.objects.create(
         music_venue=music_venue,
-        check_in=datetime.utcnow(),
-        check_out=datetime.utcnow() + timedelta(days=3),
+        check_in=current_date,
+        check_out=current_date + timedelta(days=3),
         username="Ivan",
         is_active=True,
     )
